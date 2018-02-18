@@ -28,6 +28,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.Screen;
+import java.text.DecimalFormat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +48,7 @@ public class Blasteraks extends Application {
 
 
     //--------------------------------------Text stuff..
-    private int pHP = 0;
+    //private int pHP = 0;
     private double spd = 0;
 
     //--------------------------------------Game objects.
@@ -88,14 +89,17 @@ public class Blasteraks extends Application {
         player.setVelocity(new Point2D(0,0));
 
         //Define some information to be shown in dataPane.
-        Text playerHealth = new Text(0, 20, "" + player.getHealth());
-        playerHealth.textProperty().bind("" + getpHP());
+        Text playerHealth = new Text(0, 20, "Health: " + player.getHealth());
         playerHealth.setFill(Color.RED);
 
-        Text playerSpeed = new Text("Speed: " + getSpd());
+        Text playerLocation = new Text(0, 40,"Location: " + player.getCenterPoint());
+        playerLocation.setFill(Color.BLACK);
+
+
+        Text playerSpeed = new Text(0, 60,"Speed: " + player.getVelocity().magnitude());
         playerSpeed.setTranslateY(10);
 
-        dataPane.getChildren().addAll(playerHealth, playerSpeed);
+        dataPane.getChildren().addAll(playerHealth, playerLocation, playerSpeed);
 
         //Set player model to existing model (FXML).
         FXMLLoader loader = new FXMLLoader();
@@ -166,28 +170,38 @@ public class Blasteraks extends Application {
     //Performs various functions that need to happen frequently.
     private void onUpdate() {
 
+        // Ensures that timerCycles, which is used for timing certain things, is always going between 0 and 59.
         if (timerCycles == 60) {
 
             timerCycles = 0;
         }
 
+        // Updates number of times we've been through the onUpdate() function in order to time certain things, like
+        // decay of bullets and bullet spawn speed.
         timerCycles++;
 
-        /*Node nodeOut = dataPane.getChildren().get(1);
-        if (nodeOut instanceof Label) {
-            //for(Node nodeIn:((Label)nodeOut).getChildren()) {
+        // Updates the player health, location, and speed displays in the data pane. Uses a DecimalFormat for
+        // formatting.
+        DecimalFormat tempdf = new DecimalFormat("#.#");
 
-            }
-        }*/
-        //dataPane.getChildren().          //player.getVelocity().magnitude();
+        Text currentHealth = new Text(0, 20,"Health: " + player.getHealth());
+        dataPane.getChildren().set(0, currentHealth);
 
-        setSpd(player.getVelocity().magnitude());
-        System.out.println(getSpd());
+        double x = player.getCenterPoint().getX();
+        double y = player.getCenterPoint().getY();
+        Text currentLocation = new Text(0, 40,"Location: " + tempdf.format(x) + ", " + tempdf.format(y));
+        dataPane.getChildren().set(1, currentLocation);
+
+        tempdf = new DecimalFormat("#.##");
+
+        double speed = player.getVelocity().magnitude();
+        Text currentSpeed = new Text(0, 60,"Speed: " + tempdf.format(speed));
+        dataPane.getChildren().set(2, currentSpeed);
 
         //Check if the player's at an edge and move it if it is.
         player.reflect(actionPane.getPrefWidth(), actionPane.getPrefHeight());
 
-        //Using the flags created earlier, we take check if the player is hitting a key and act accordingly.
+        //Using the flags created earlier, check if the player is hitting a key and act accordingly.
         if (keyLeft) {
             player.rotateLeft();
         }
@@ -253,8 +267,8 @@ public class Blasteraks extends Application {
 
 
             /*
-            The following code is useful for debugging issues with the center point. It makes the centerpoint
-            leave a trail of bullets.
+            The following code is useful for debugging issues with the center point. It makes the center point of
+            the player object leave a trail of bullets.
             player.setCenterPoint();
             Bullet bullet2 = new Bullet();
             addBullet(bullet2, player.getCenterPoint().getX(), player.getCenterPoint().getY());
@@ -326,13 +340,9 @@ public class Blasteraks extends Application {
 
     }
 
-    public int getpHP() {
-        return pHP;
-    }
 
-    public void setPHP(int hp) {
-        pHP = hp;
-    }
+
+
 
     public double getSpd(){
         return spd;

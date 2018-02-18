@@ -54,6 +54,8 @@ public class GameObject {
     }
 
     public Point2D getCenterPoint() {
+
+        setCenterPoint();
         return centerPoint;
     }
 
@@ -80,8 +82,9 @@ public class GameObject {
 
     public void updateBulletSpawn() {
         setCenterPoint();
-        System.out.println("player center point is: " + getCenterPoint());
-        System.out.println("bullet spawn is at: " + getBulletSpawn());
+
+
+
         double angle = getView().getRotate();
         setBulletSpawn(new Point2D(Math.cos(Math.toRadians(angle)) * 14 + getCenterPoint().getX(), Math.sin(Math.toRadians(angle)) * 14 + getCenterPoint().getY()) );
 
